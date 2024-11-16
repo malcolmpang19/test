@@ -28,4 +28,4 @@ jobs:
           rsync -avz --delete \
             --exclude=".git/" \
             ./ \
-            ec2-user@172.31.19.73:/var/www/html/test
+            ssm-user@172.31.19.73:/var/www/html/test

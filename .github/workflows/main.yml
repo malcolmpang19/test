@@ -20,7 +20,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 3.0.96.10 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 172.31.19.73 >> ~/.ssh/known_hosts
 
       # Step 3: Sync files to server
       - name: Deploy files
@@ -28,4 +28,4 @@ jobs:
           rsync -avz --delete \
             --exclude=".git/" \
             ./ \
-            ec2-user@3.0.96.10:/var/www/html/test
+            ec2-user@172.31.19.73:/var/www/html/test

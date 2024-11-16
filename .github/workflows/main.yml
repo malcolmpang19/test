@@ -3,29 +3,31 @@ name: Deploy to RHEL Server
 on:
   push:
     branches:
-      - main  # Adjust to your default branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up SSH
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ec2-3-0-96-10.ap-southeast-1.compute.amazonaws.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H 172.31.19.73 >> ~/.ssh/known_hosts
+          ls -la ~/.ssh
+          cat ~/.ssh/known_hosts
 
-      # Step 3: Sync files to server
+      - name: Debug SSH Connection
+        run: |
+          ssh -v ssm-user@172.31.19.73 "echo SSH connection successful"
+
       - name: Deploy files
         run: |
           rsync -avz --delete \
-            --exclude=".git/" \
             ./ \
-            root@ec2-3-0-96-10.ap-southeast-1.compute.amazonaws.com:/var/www/html/test
+            ssm-user@172.31.19.73:/var/www/html/test

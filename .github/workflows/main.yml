@@ -1,0 +1,31 @@
+name: Deploy to RHEL Server
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 3.0.96.10 >> ~/.ssh/known_hosts
+
+      # Step 3: Sync files to server
+      - name: Deploy files
+        run: |
+          rsync -avz --delete \
+            --exclude=".git/" \
+            ./ \
+            ec2-user@3.0.96.10:/var/www/html/test

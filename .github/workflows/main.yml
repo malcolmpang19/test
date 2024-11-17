@@ -11,7 +11,10 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
-      
+      - name: Set correct permissions for the repository
+        run: |
+          sudo chown -R $(whoami):$(whoami) /var/www/html/test
+          sudo chmod -R u+rw /var/www/html/test
       - name: Push updates to the RHEL server repository
         run: |
           cd /var/www/html/test

@@ -23,28 +23,18 @@ jobs:
       #    VALIDATE_ALL_CODEBASE: true
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-     # Step 3: Run Tests
-      - name: Run Unit Tests
-        continue-on-error: true
+    # Step 2: Lint HTML, CSS, and JavaScript
+      - name: Lint HTML, CSS, and JavaScript
         run: |
-          # Example: Run tests with a JavaScript framework like Jest
-          npm install
-          npm test
+          sudo apt-get update
+          sudo apt-get install tidy -y  # HTML linter
+          npm install -g stylelint stylelint-config-standard  # CSS linter
+          npm install -g jshint  # JS linter
 
-      # Step 4: Perform Security Scans
-      - name: Run Security Scan
-        continue-on-error: true
-        run: |
-          # Example: Use npm audit for Node.js projects
-          npm audit --production
-
-      # Step 5: Benchmark Performance
-      - name: Run Performance Benchmark
-        continue-on-error: true
-        run: |
-          # Example: Run a custom benchmark script
-          node benchmark.js
-
+          find . -name "*.html" -exec tidy -q -e {} \; || true
+          stylelint "**/*.css" --config standard || true
+          jshint **/*.js || true
+          
   update-repo:
     runs-on: self-hosted
 

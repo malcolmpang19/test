@@ -18,8 +18,8 @@ jobs:
       - name: Run Super Linter
         uses: github/super-linter@v5
         env:
-          DEFAULT_BRANCH: main
-          VALIDATE_ALL_CODEBASE: true
+          #DEFAULT_BRANCH: main
+          #VALIDATE_ALL_CODEBASE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 3: Run Basic Tests

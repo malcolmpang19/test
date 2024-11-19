@@ -1,4 +1,4 @@
-name: Push Main to RHEL Server
+name: CI/CD Pipeline for Main Branch
 
 on:
   push:
@@ -6,16 +6,56 @@ on:
       - main
 
 jobs:
-  update-repo:
-    runs-on: self-hosted
+  ci-pipeline:
+    runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Check out the code
       - name: Check out the repository
         uses: actions/checkout@v3
+
+      # Step 2: Run Linting
+      - name: Run Linter
+        run: |
+          # Example: Use ESLint for JavaScript/TypeScript
+          npm install --global eslint
+          eslint . --ext .js,.ts
+
+      # Step 3: Run Tests
+      - name: Run Unit Tests
+        run: |
+          # Example: Run tests with a JavaScript framework like Jest
+          npm install
+          npm test
+
+      # Step 4: Perform Security Scans
+      - name: Run Security Scan
+        run: |
+          # Example: Use npm audit for Node.js projects
+          npm audit --production
+
+      # Step 5: Benchmark Performance
+      - name: Run Performance Benchmark
+        run: |
+          # Example: Run a custom benchmark script
+          node benchmark.js
+
+  update-repo:
+    runs-on: self-hosted
+
+    steps:
+      # Step 6: Check out the repository
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      # Step 7: Set correct permissions for the repository on the server
       - name: Set correct permissions for the repository
         run: |
           sudo chown -R $(whoami):$(whoami) /var/www/html/test
           sudo chmod -R u+rw /var/www/html/test
-      - name: Push updates to the RHEL server repository
+
+      # Step 8: Push updates to the RHEL server repository
+      - name: Push updates to the RHEL server
         run: |
           cd /var/www/html/test
           git fetch origin main

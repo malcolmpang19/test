@@ -13,13 +13,19 @@ jobs:
       # Step 1: Check out the code
       - name: Check out the repository
         uses: actions/checkout@v3
-
+        
+      - name: Show GITHUB_TOKEN permissions
+      run: |
+      curl -H "Authorization: Bearer $GITHUB_TOKEN" \
+           -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/rate_limit
+      
       # Step 2: Run Super Linter
       - name: Run Super Linter
         uses: github/super-linter@v5
         env:
-          #DEFAULT_BRANCH: main
-          #VALIDATE_ALL_CODEBASE: true
+          DEFAULT_BRANCH: main
+          VALIDATE_ALL_CODEBASE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 3: Run Basic Tests

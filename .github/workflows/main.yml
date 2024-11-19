@@ -16,6 +16,7 @@ jobs:
         
       - name: Show GITHUB_TOKEN permissions
         run: |
+          export GITHUB_TOKEN=your_token_here
           curl -H "Authorization: Bearer $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/user

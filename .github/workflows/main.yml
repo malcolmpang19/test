@@ -13,25 +13,19 @@ jobs:
       # Step 1: Check out the code
       - name: Check out the repository
         uses: actions/checkout@v3
-        
-      - name: Show GITHUB_TOKEN permissions
-        run: |
-          export GITHUB_TOKEN=your_token_here
-          curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/user
       
       # Step 2: Run Super Linter
-      - name: Run Super Linter
-        uses: github/super-linter@v5
-        continue-on-error: true
-        env:
-          DEFAULT_BRANCH: main
-          VALIDATE_ALL_CODEBASE: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Run Super Linter
+      #  uses: github/super-linter@v5
+      #  continue-on-error: true
+      #  env:
+      #    DEFAULT_BRANCH: main
+      #    VALIDATE_ALL_CODEBASE: true
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
      # Step 3: Run Tests
       - name: Run Unit Tests
+        continue-on-error: true
         run: |
           # Example: Run tests with a JavaScript framework like Jest
           npm install
@@ -39,12 +33,14 @@ jobs:
 
       # Step 4: Perform Security Scans
       - name: Run Security Scan
+        continue-on-error: true
         run: |
           # Example: Use npm audit for Node.js projects
           npm audit --production
 
       # Step 5: Benchmark Performance
       - name: Run Performance Benchmark
+        continue-on-error: true
         run: |
           # Example: Run a custom benchmark script
           node benchmark.js

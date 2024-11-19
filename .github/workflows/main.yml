@@ -23,17 +23,46 @@ jobs:
       #    VALIDATE_ALL_CODEBASE: true
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Step 2: Lint HTML, CSS, and JavaScript
-      - name: Lint HTML, CSS, and JavaScript
+ # Step 3: Run Basic Tests
+      - name: Run Smoke Tests
         run: |
-          sudo apt-get update
-          sudo apt-get install tidy -y  # HTML linter
-          npm install -g stylelint stylelint-config-standard  # CSS linter
-          npm install -g jshint  # JS linter
+          python3 -m http.server 8080 &
+          sleep 2
+          curl -I http://localhost:8080 || exit 1
 
-          find . -name "*.html" -exec tidy -q -e {} \; || true
-          stylelint "**/*.css" --config standard || true
-          jshint **/*.js || true
+      # Step 4: Perform Security Scan
+      - name: Run Security Scan
+        run: |
+          npm install -g retire
+          retire --path . --outputformat text || true
+
+      # Step 5: Performance Benchmarking with Lighthouse
+      - name: Run Lighthouse Performance Benchmark
+        run: |
+          # Install Lighthouse
+          npm install -g lighthouse
+          # Run Lighthouse on the local server
+          lighthouse http://localhost:8080 --output html --output-path ./lighthouse-report.html --only-categories=performance
+          
+      # Step 6: Performance Benchmarking with WebPageTest
+      - name: Run WebPageTest Performance Benchmark
+        run: |
+          curl -X POST \
+          -d "url=http://localhost:8080&k=YOUR_WPTEST_API_KEY" \
+          https://www.webpagetest.org/runtest.php
+          
+      # Step 7: Apache Bench - Server Performance
+      - name: Run Apache Bench (ab) for Load Testing
+        run: |
+          sudo apt-get install -y apache2-utils
+          ab -n 1000 -c 10 http://localhost:8080/
+
+      # Step 8: Upload Lighthouse Report as Artifact
+      - name: Upload Lighthouse Performance Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-report
+          path: ./lighthouse-report.html
           
   update-repo:
     runs-on: self-hosted

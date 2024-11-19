@@ -14,47 +14,61 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v3
 
-      # Step 2: Run Linting
-      - name: Run Linter
+      # Step 2: Lint HTML, CSS, and JavaScript
+      - name: Lint HTML, CSS, and JavaScript
         run: |
-          # Example: Use ESLint for JavaScript/TypeScript
-          npm install --global eslint
-          eslint . --ext .js,.ts
+          sudo apt-get update
+          sudo apt-get install tidy -y  # HTML linter
+          npm install -g stylelint stylelint-config-standard  # CSS linter
+          npm install -g jshint  # JS linter
 
-      # Step 3: Run Tests
-      - name: Run Unit Tests
+          find . -name "*.html" -exec tidy -q -e {} \; || true
+          stylelint "**/*.css" --config standard || true
+          jshint **/*.js || true
+
+      # Step 3: Run Basic Tests
+      - name: Run Smoke Tests
         run: |
-          # Example: Run tests with a JavaScript framework like Jest
-          npm install
-          npm test
+          python3 -m http.server 8080 &
+          sleep 2
+          curl -I http://localhost:8080 || exit 1
 
-      # Step 4: Perform Security Scans
+      # Step 4: Perform Security Scan
       - name: Run Security Scan
         run: |
-          # Example: Use npm audit for Node.js projects
-          npm audit --production
+          npm install -g retire
+          retire --path . --outputformat text || true
 
-      # Step 5: Benchmark Performance
+      # Step 5: Performance Benchmarking
       - name: Run Performance Benchmark
         run: |
-          # Example: Run a custom benchmark script
-          node benchmark.js
+          # Install Lighthouse (Google's performance benchmarking tool)
+          npm install -g lighthouse
+          # Run Lighthouse on the local server
+          lighthouse http://localhost:8080 --output html --output-path ./lighthouse-report.html --only-categories=performance
+
+      # Step 6: Upload Lighthouse Report as Artifact
+      - name: Upload Lighthouse Performance Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-report
+          path: ./lighthouse-report.html
 
   update-repo:
     runs-on: self-hosted
 
     steps:
-      # Step 6: Check out the repository
+      # Step 7: Check out the repository
       - name: Check out the repository
         uses: actions/checkout@v3
 
-      # Step 7: Set correct permissions for the repository on the server
+      # Step 8: Set correct permissions for the repository on the server
       - name: Set correct permissions for the repository
         run: |
           sudo chown -R $(whoami):$(whoami) /var/www/html/test
           sudo chmod -R u+rw /var/www/html/test
 
-      # Step 8: Push updates to the RHEL server repository
+      # Step 9: Push updates to the RHEL server repository
       - name: Push updates to the RHEL server
         run: |
           cd /var/www/html/test

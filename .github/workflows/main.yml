@@ -14,17 +14,13 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v3
 
-      # Step 2: Lint HTML, CSS, and JavaScript
-      - name: Lint HTML, CSS, and JavaScript
-        run: |
-          sudo apt-get update
-          sudo apt-get install tidy -y  # HTML linter
-          npm install -g stylelint stylelint-config-standard  # CSS linter
-          npm install -g jshint  # JS linter
-
-          find . -name "*.html" -exec tidy -q -e {} \; || true
-          stylelint "**/*.css" --config standard || true
-          jshint **/*.js || true
+      # Step 2: Run Super Linter
+      - name: Run Super Linter
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          VALIDATE_ALL_CODEBASE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 3: Run Basic Tests
       - name: Run Smoke Tests
@@ -42,7 +38,7 @@ jobs:
       # Step 5: Performance Benchmarking
       - name: Run Performance Benchmark
         run: |
-          # Install Lighthouse (Google's performance benchmarking tool)
+          # Install Lighthouse
           npm install -g lighthouse
           # Run Lighthouse on the local server
           lighthouse http://localhost:8080 --output html --output-path ./lighthouse-report.html --only-categories=performance

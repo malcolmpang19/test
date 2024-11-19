@@ -18,7 +18,7 @@ jobs:
         run: |
           curl -H "Authorization: Bearer $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/rate_limit
+          https://api.github.com/user
       
       # Step 2: Run Super Linter
       - name: Run Super Linter

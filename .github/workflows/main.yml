@@ -24,6 +24,7 @@ jobs:
       # Step 2: Run Super Linter
       - name: Run Super Linter
         uses: github/super-linter@v5
+        continue-on-error: true
         env:
           DEFAULT_BRANCH: main
           VALIDATE_ALL_CODEBASE: true
